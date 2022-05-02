@@ -72,15 +72,15 @@ export function hasEmptyWorkPile(work: Pile[]) {
   return work.some(pile => pile.length === 0);
 }
 
-function workPilePlaysOnWorkPile(src: Pile, dst: Pile) {
+export function workPilePlaysOnWorkPile(src: Pile, dst: Pile) {
   return cardPlaysOnWorkPile(src[0], dst);
 }
 
-function workPilePlayUnderWorkPile(src: Pile, dst: Pile) {
+export function workPilePlayUnderWorkPile(src: Pile, dst: Pile) {
   return cardPlaysOnWorkPile(src[src.length - 1], dst);
 }
 
-function cardPlaysOnAcePile(card: Card, pile: Pile) {
+export function cardPlaysOnAcePile(card: Card, pile: Pile) {
   const len = pile.length;
   if (len === 0) return false;
   const top = pile[len - 1];
