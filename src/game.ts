@@ -3,31 +3,31 @@
 // It could be a lovely as-god-intended byte if we limit to 4 players, but there's not really a need for that, except aesthetic & religious purity.
 // We could just number cards 0-51 but then we have to use division (instead of bit operations) to get suites and color, and I cannot abide that
 
-type Card = number;
+export type Card = number;
 
-const cardRank = (card: Card) => card & 0b000001111;
-const cardSuite = (card: Card) => ((card & 0b000110000) >> 4) as Suite;
-const cardColor = (card: Card) => ((card & 0b000010000) >> 4) as Color;
-const cardDeck = (card: Card) => (card & 0b111000000) >> 6;
+export const cardRank = (card: Card) => card & 0b000001111;
+export const cardSuite = (card: Card) => ((card & 0b000110000) >> 4) as Suite;
+export const cardColor = (card: Card) => ((card & 0b000010000) >> 4) as Color;
+export const cardDeck = (card: Card) => (card & 0b111000000) >> 6;
 
-enum Suite {
+export enum Suite {
   Clubs,
   Diamonds,
   Spades,
   Hearts,
 }
 
-enum Color {
+export enum Color {
   Black,
   Red,
 }
 
-const newCard = (rank: number, suite: Suite, deck = 0) =>
+export const newCard = (rank: number, suite: Suite, deck = 0) =>
   rank | (suite << 4) | (deck << 6);
 
-type Pile = Card[];
+export type Pile = Card[];
 
-interface Hand {
+export interface Hand {
   player: {
     draw: Pile;
     drawDiscard: Pile;
@@ -45,7 +45,7 @@ interface Hand {
   ace: Pile[];
 }
 
-function cardPlaysOnWorkPile(card: Card, pile: Pile) {
+export function cardPlaysOnWorkPile(card: Card, pile: Pile) {
   const len = pile.length;
 
   if (len === 0) return true;
@@ -57,7 +57,7 @@ function cardPlaysOnWorkPile(card: Card, pile: Pile) {
   );
 }
 
-function cardPlaysUnderWorkPile(card: Card, pile: Pile) {
+export function cardPlaysUnderWorkPile(card: Card, pile: Pile) {
   if (pile.length === 0) return false;
 
   const bottom = pile[0];
@@ -68,7 +68,7 @@ function cardPlaysUnderWorkPile(card: Card, pile: Pile) {
   );
 }
 
-function hasEmptyWorkPile(work: Pile[]) {
+export function hasEmptyWorkPile(work: Pile[]) {
   return work.some(pile => pile.length === 0);
 }
 
@@ -88,12 +88,3 @@ function cardPlaysOnAcePile(card: Card, pile: Pile) {
     cardSuite(top) === cardSuite(card) && cardRank(top) === cardRank(card) - 1
   );
 }
-
-const card = newCard(4, Suite.Hearts);
-console.log(
-  card,
-  cardRank(card),
-  cardSuite(card),
-  cardColor(card),
-  cardDeck(card)
-);
