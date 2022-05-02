@@ -22,7 +22,8 @@ enum Color {
   Red,
 }
 
-const newCard = (rank: number, suite: Suite, deck: number = 0) => rank | (suite << 4) | (deck << 6);
+const newCard = (rank: number, suite: Suite, deck = 0) =>
+  rank | (suite << 4) | (deck << 6);
 
 type Pile = Card[];
 
@@ -89,4 +90,10 @@ function cardPlaysOnAcePile(card: Card, pile: Pile) {
 }
 
 const card = newCard(4, Suite.Hearts);
-console.log(card, cardRank(card), cardSuite(card), cardColor(card), cardDeck(card));
+console.log(
+  card,
+  cardRank(card),
+  cardSuite(card),
+  cardColor(card),
+  cardDeck(card)
+);
