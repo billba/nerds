@@ -7,7 +7,13 @@ import {
   cardColor,
   cardDeck,
   cardName,
+  newPile,
+  pileToString,
+  cardPlaysOnWorkPile,
+  cardPlaysUnderWorkPile,
 } from './game';
+
+const fourCards = ['♥️4', '♣︎10', '♦️K', '♥️A'];
 
 describe('newCard', () => {
   test('4 of hearts, default deck', () => {
@@ -49,5 +55,111 @@ describe('cardName', () => {
   });
   test('Jack of clubs', () => {
     expect(cardName(newCard('♣︎10'))).toBe('♣︎10');
+  });
+});
+
+describe('newPile', () => {
+  test('no cards', () => {
+    expect(newPile([])).toStrictEqual([]);
+  });
+  test('one card', () => {
+    expect(newPile(['♥️4'])).toStrictEqual([newCard('♥️4')]);
+  });
+  test('three cards card', () => {
+    expect(newPile(fourCards)).toStrictEqual(fourCards.map(newCard));
+  });
+});
+
+describe('pileToString', () => {
+  test('no cards', () => {
+    expect(pileToString(newPile([]))).toBe('');
+  });
+  test('one card', () => {
+    expect(pileToString(newPile(['♥️4']))).toBe('♥️4');
+  });
+  test('three cards card', () => {
+    expect(pileToString(newPile(fourCards))).toBe('♥️4-♣︎10-♦️K-♥️A');
+  });
+});
+
+describe('cardPlaysOnWorkPile', () => {
+  test('no cards', () => {
+    expect(cardPlaysOnWorkPile(newCard('♥️4'), newPile([]))).toBe(true);
+  });
+  test('one card, different color, same rank', () => {
+    expect(cardPlaysOnWorkPile(newCard('♥️4'), newPile(['♣︎4']))).toBe(false);
+  });
+  test('one card, different color, one rank lower', () => {
+    expect(cardPlaysOnWorkPile(newCard('♥️4'), newPile(['♣︎3']))).toBe(false);
+  });
+  test('one card, same color, one rank higher', () => {
+    expect(cardPlaysOnWorkPile(newCard('♥️4'), newPile(['♦️5']))).toBe(false);
+  });
+  test('one card, different color, one rank higher', () => {
+    expect(cardPlaysOnWorkPile(newCard('♥️4'), newPile(['♣︎5']))).toBe(true);
+  });
+  test('two cards, different color, top card same rank', () => {
+    expect(cardPlaysOnWorkPile(newCard('♥️4'), newPile(['♦️5', '♣︎4']))).toBe(
+      false
+    );
+  });
+  test('two cards, different color, top card one rank lower', () => {
+    expect(cardPlaysOnWorkPile(newCard('♥️4'), newPile(['♦️4', '♣︎3']))).toBe(
+      false
+    );
+  });
+  test('two cards, same color, top card one rank higher', () => {
+    expect(cardPlaysOnWorkPile(newCard('♥️4'), newPile(['♣︎6', '♦️5']))).toBe(
+      false
+    );
+  });
+  test('two cards, different color, top card one rank higher', () => {
+    expect(cardPlaysOnWorkPile(newCard('♥️4'), newPile(['♦️6', '♣︎5']))).toBe(
+      true
+    );
+  });
+});
+
+describe('cardPlaysUnderWorkPile', () => {
+  test('no cards', () => {
+    expect(cardPlaysUnderWorkPile(newCard('♥️4'), newPile([]))).toBe(false);
+  });
+  test('one card, different color, same rank', () => {
+    expect(cardPlaysUnderWorkPile(newCard('♥️4'), newPile(['♣︎4']))).toBe(
+      false
+    );
+  });
+  test('one card, different color, one rank lower', () => {
+    expect(cardPlaysUnderWorkPile(newCard('♥️4'), newPile(['♣︎3']))).toBe(true);
+  });
+  test('one card, same color, one rank lower', () => {
+    expect(cardPlaysUnderWorkPile(newCard('♥️4'), newPile(['♦️3']))).toBe(
+      false
+    );
+  });
+  test('one card, different color, one rank higher', () => {
+    expect(cardPlaysUnderWorkPile(newCard('♥️4'), newPile(['♣︎5']))).toBe(
+      false
+    );
+  });
+  test('two cards, different color, bottom card same rank', () => {
+    expect(
+      cardPlaysUnderWorkPile(newCard('♥️4'), newPile(['♣︎4', '♦️3']))
+    ).toBe(false);
+  });
+  test('two cards, different color, bottom card one rank lower', () => {
+    expect(cardPlaysUnderWorkPile(newCard('♥️4'), newPile(['♦️3', '♣2']))).toBe(
+      false
+    );
+  });
+  test('two cards, same color, bottom card one rank higher', () => {
+    expect(
+      cardPlaysUnderWorkPile(newCard('♥️4'), newPile(['♦️5', '♣︎4']))
+    ).toBe(false);
+  });
+  test('two cards, different color, bottom card one rank higher', () => {
+    expect(
+      cardPlaysUnderWorkPile(newCard('♥️4'), newPile(['♣︎3', '♦️2']))
+    ).toBe(true);
   });
 });

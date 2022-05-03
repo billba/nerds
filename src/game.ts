@@ -54,6 +54,14 @@ export function cardName(card: Card): string {
   return `${suitemoji[cardSuite(card)]}${rankmoji[cardRank(card) - 1]}`;
 }
 
+export function newPile(cards: string[]): Pile {
+  return cards.map(newCard);
+}
+
+export function pileToString(pile: Pile) {
+  return pile.map(cardName).join('-');
+}
+
 export type Pile = Card[];
 
 export interface Hand {
