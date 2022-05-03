@@ -66,22 +66,17 @@ export function pileToString(pile: Pile) {
   return pile.map(cardName).join('-');
 }
 
-export interface Hand {
-  player: {
-    draw: Pile;
-    drawDiscard: Pile;
-    nerds: Pile;
-    nerdsDiscard: Pile;
-    work: Pile[];
+export interface Player {
+  draw: Pile;
+  drawDiscard: Pile;
+  nerds: Pile;
+  nerdsDiscard: Pile;
+  workPiles: Pile[];
+}
 
-    // A guess as to how we'll share each player's "I'm moving a card" state
-    // cardInMotion: Card,
-    // cardInMotionX: Number,
-    // cardInMotionY: Number,
-    // cardPileSource: PileType,
-    // cardPileIndex: Number,
-  }[];
-  ace: Pile[];
+export interface Hand {
+  players: Player[];
+  acePiles: Pile[];
 }
 
 export function cardPlaysOnWorkPile(card: Card, pile: Pile) {
@@ -129,4 +124,51 @@ export function cardPlaysOnAcePile(card: Card, pile: Pile) {
   return (
     cardSuite(top) === cardSuite(card) && cardRank(top) === cardRank(card) - 1
   );
+}
+
+export function newShuffledDeck(deck: number = 0): Pile {
+  const pile: Pile = [];
+
+  for (let suite = 0; suite < 4; suite++) {
+    for (let rank = 0; rank < 13; rank++) {
+      pile.push(newCard(rank + 1, suite, deck));
+    }
+  }
+
+  for (let i = pile.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pile[i], pile[j]] = [pile[j], pile[i]];
+  }
+
+  return pile;
+}
+
+export function newHand(numPlayers: number): Hand {
+  let players: Player[] = [];
+  for (let player = 0; player < numPlayers; player++) {
+    const draw = newShuffledDeck(player);
+
+    let workPiles: Pile[] = [];
+    for (let i = 0; i < 4; i++) {
+      workPiles.push([draw.pop()!]);
+    }
+
+    let nerds: Pile = [];
+    for (let i = 0; i < 13; i++) {
+      nerds.push(draw.pop()!);
+    }
+
+    players.push({
+      draw,
+      drawDiscard: [],
+      nerds,
+      nerdsDiscard: [],
+      workPiles,
+    });
+  }
+
+  return {
+    players,
+    acePiles: [],
+  }
 }

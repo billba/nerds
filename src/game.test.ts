@@ -15,6 +15,8 @@ import {
   workPilePlaysOnWorkPile,
   workPilePlaysUnderWorkPile,
   cardPlaysOnAcePile,
+  newShuffledDeck,
+  newHand,
 } from './game';
 
 const fourCards = ['♥️4', '♣︎10', '♦️K', '♥️A'];
@@ -402,3 +404,12 @@ describe('cardPlaysOnAcePile', () => {
     ).toBe(false);
   });
 });
+
+describe('shuffledDeck', () => {
+  test('keeps 52 distinct cards', () => {
+    const deck = newShuffledDeck();
+    const set = new Set<number>(deck);
+    expect(set.size).toBe(52);
+  });
+});
+
