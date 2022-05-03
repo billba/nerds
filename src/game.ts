@@ -45,8 +45,8 @@ export function newCard(rank: number, suite: number, deck?: number): Card;
 export function newCard(...args: [number | string, number?, number?]): Card {
   return typeof args[0] === 'number'
     ? args[0] | (args[1]! << 4) | ((args[2]! ?? 0) << 6)
-    : (rankmoji.indexOf((args[0] as string).slice(2)) + 1) |
-        (suitemoji.indexOf((args[0] as string).slice(0, 2)) << 4) |
+    : (rankmoji.indexOf(args[0].slice(2)) + 1) |
+        (suitemoji.indexOf(args[0].slice(0, 2)) << 4) |
         ((args[1]! ?? 0) << 6);
 }
 
@@ -54,15 +54,17 @@ export function cardName(card: Card): string {
   return `${suitemoji[cardSuite(card)]}${rankmoji[cardRank(card) - 1]}`;
 }
 
-export function newPile(cards: string[]): Pile {
-  return cards.map(newCard);
+export type Pile = Card[];
+
+export function newPile(cards: string[]): Pile;
+export function newPile(cards: string): Pile;
+export function newPile(cards: string | string[]): Pile {
+  return (typeof cards === 'string' ? cards.split('-') : cards).map(newCard);
 }
 
 export function pileToString(pile: Pile) {
   return pile.map(cardName).join('-');
 }
-
-export type Pile = Card[];
 
 export interface Hand {
   player: {
