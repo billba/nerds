@@ -108,20 +108,23 @@ export function cardPlaysUnderWorkPile(card: Card, pile: Pile) {
 }
 
 export function hasEmptyWorkPile(work: Pile[]) {
+  if (work.length !== 4) throw 'Must have 4 work piles';
   return work.some(pile => pile.length === 0);
 }
 
 export function workPilePlaysOnWorkPile(src: Pile, dst: Pile) {
+  if (src.length === 0) throw 'Source work pile must be non-empty';
   return cardPlaysOnWorkPile(src[0], dst);
 }
 
-export function workPilePlayUnderWorkPile(src: Pile, dst: Pile) {
-  return cardPlaysOnWorkPile(src[src.length - 1], dst);
+export function workPilePlaysUnderWorkPile(src: Pile, dst: Pile) {
+  if (src.length === 0) throw 'Source work pile must be non-empty';
+  return cardPlaysUnderWorkPile(src[src.length - 1], dst);
 }
 
 export function cardPlaysOnAcePile(card: Card, pile: Pile) {
   const len = pile.length;
-  if (len === 0) return false;
+  if (len === 0) return cardRank(card) === 1;
   const top = pile[len - 1];
   return (
     cardSuite(top) === cardSuite(card) && cardRank(top) === cardRank(card) - 1
