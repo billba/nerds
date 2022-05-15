@@ -13,10 +13,10 @@ import {
   cardPlaysUnderWorkPile,
   hasEmptyWorkPile,
   workPilePlaysOnWorkPile,
-  workPilePlaysUnderWorkPile,
   cardPlaysOnAcePile,
   newShuffledDeck,
-  newHand,
+  reducer,
+  HandState,
 } from './game';
 
 const fourCards = ['♥️4', '♣︎10', '♦️K', '♥️A'];
@@ -46,7 +46,7 @@ describe('newCard', () => {
     expect(cardDeck(card)).toBe(0);
   });
 
-  test('Jack of clubs via emoji, specify deck', () => {
+  test('10 of clubs via emoji, specify deck', () => {
     const card = newCard('♣︎10', 3);
     expect(cardRank(card)).toBe(10);
     expect(cardSuite(card)).toBe(Suite.Clubs);
@@ -77,10 +77,14 @@ describe('newPile', () => {
     expect(newPile('♥️4')).toStrictEqual([newCard('♥️4')]);
   });
   test('four cards array', () => {
-    expect(newPile(fourCards)).toStrictEqual(fourCards.map(newCard));
+    expect(newPile(fourCards)).toStrictEqual(
+      fourCards.map(card => newCard(card))
+    );
   });
   test('four cards string', () => {
-    expect(newPile(fourCardsString)).toStrictEqual(fourCards.map(newCard));
+    expect(newPile(fourCardsString)).toStrictEqual(
+      fourCards.map(card => newCard(card))
+    );
   });
 });
 
@@ -266,100 +270,6 @@ describe('workPilePlaysOnWorkPile', () => {
   });
 });
 
-describe('cardPlaysUnderWorkPile', () => {
-  test('source empty', () => {
-    expect(() => workPilePlaysOnWorkPile([], [])).toThrow();
-  });
-  test('one card on no cards', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♥️4'), newPile([]))).toBe(false);
-  });
-  test('one card on one card, different color, same rank', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♥️4'), newPile('♣︎4'))).toBe(
-      false
-    );
-  });
-  test('one card on one card, different color, one rank lower', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♥️4'), newPile('♣︎3'))).toBe(
-      true
-    );
-  });
-  test('one card on one card, same color, one rank lower', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♥️4'), newPile('♦️3'))).toBe(
-      false
-    );
-  });
-  test('one card on one card, different color, one rank higher', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♥️4'), newPile('♣︎5'))).toBe(
-      false
-    );
-  });
-  test('one card on two cards, different color, same rank', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♥️4'), newPile('♣︎4-♦️3'))).toBe(
-      false
-    );
-  });
-  test('one card on two cards, different color, one rank lower', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♥️4'), newPile('♦️3-♣2'))).toBe(
-      false
-    );
-  });
-  test('one card on two cards, same color, one rank higher', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♥️4'), newPile('♦️5-♣︎4'))).toBe(
-      false
-    );
-  });
-  test('one card on two cards, different color, one rank higher', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♥️4'), newPile('♣︎3-♦️2'))).toBe(
-      true
-    );
-  });
-  test('two cards on no cards', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♣︎5-♥️4'), newPile([]))).toBe(
-      false
-    );
-  });
-  test('two cards on one card, different color, same rank', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♣︎5-♥️4'), newPile('♣︎4'))).toBe(
-      false
-    );
-  });
-  test('two cards on one card, different color, one rank lower', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♣︎5-♥️4'), newPile('♣︎3'))).toBe(
-      true
-    );
-  });
-  test('two cards on one card, same color, one rank lower', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♣︎5-♥️4'), newPile('♦️3'))).toBe(
-      false
-    );
-  });
-  test('two cards on one card, different color, one rank higher', () => {
-    expect(workPilePlaysUnderWorkPile(newPile('♣︎5-♥️4'), newPile('♣︎5'))).toBe(
-      false
-    );
-  });
-  test('two cards on two cards, different color, same rank', () => {
-    expect(
-      workPilePlaysUnderWorkPile(newPile('♣︎5-♥️4'), newPile('♣︎4-♦️3'))
-    ).toBe(false);
-  });
-  test('two cards on two cards, different color, one rank lower', () => {
-    expect(
-      workPilePlaysUnderWorkPile(newPile('♣︎5-♥️4'), newPile('♦️3-♣2'))
-    ).toBe(false);
-  });
-  test('two cards on two cards, same color, one rank higher', () => {
-    expect(
-      workPilePlaysUnderWorkPile(newPile('♣︎5-♥️4'), newPile('♦️5-♣︎4'))
-    ).toBe(false);
-  });
-  test('two cards on two cards, different color, one rank higher', () => {
-    expect(
-      workPilePlaysUnderWorkPile(newPile('♣︎5-♥️4'), newPile('♣︎3-♦️2'))
-    ).toBe(true);
-  });
-});
-
 describe('cardPlaysOnAcePile', () => {
   test('ace on empty pile', () => {
     expect(cardPlaysOnAcePile(newCard('♣︎A'), [])).toBe(true);
@@ -413,3 +323,297 @@ describe('shuffledDeck', () => {
   });
 });
 
+describe('reducer', () => {
+  test('CallNerds', () => {
+    const hand: HandState = {
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: newPile('♣︎3'),
+          workPiles: [[], [], [], []],
+        },
+      ],
+    };
+    expect(
+      reducer(hand, {
+        name: 'CallNerds',
+        playerIndex: 0,
+      })
+    ).toStrictEqual(hand);
+  });
+
+  test('DiscardDraw 4 cards left on empty discard', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: newPile('♣︎3-♦️A-♦️5-♦️9'),
+              drawDiscardPile: [],
+              workPiles: [[], [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'DiscardDraw',
+          playerIndex: 0,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: newPile('♣︎3'),
+          drawDiscardPile: newPile('♦️9-♦️5-♦️A'),
+          workPiles: [[], [], [], []],
+        },
+      ],
+    });
+  });
+
+  test('DiscardDraw 4 cards left on non-empty discard', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: newPile('♣︎3-♦️A-♦️5-♦️9'),
+              drawDiscardPile: newPile('♣︎5'),
+              workPiles: [[], [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'DiscardDraw',
+          playerIndex: 0,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: newPile('♣︎3'),
+          drawDiscardPile: newPile('♣︎5-♦️9-♦️5-♦️A'),
+          workPiles: [[], [], [], []],
+        },
+      ],
+    });
+  });
+
+  test('DiscardDraw 3 cards left on empty discard', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: newPile('♦️A-♦️5-♦️9'),
+              drawDiscardPile: [],
+              workPiles: [[], [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'DiscardDraw',
+          playerIndex: 0,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: newPile('♦️9-♦️5-♦️A'),
+          workPiles: [[], [], [], []],
+        },
+      ],
+    });
+  });
+
+  test('DiscardDraw 3 cards left on non-empty discard', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: newPile('♦️A-♦️5-♦️9'),
+              drawDiscardPile: newPile('♣︎5'),
+              workPiles: [[], [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'DiscardDraw',
+          playerIndex: 0,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: newPile('♣︎5-♦️9-♦️5-♦️A'),
+          workPiles: [[], [], [], []],
+        },
+      ],
+    });
+  });
+
+  test('DiscardDraw 2 cards left on empty discard', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: newPile('♦️5-♦️9'),
+              drawDiscardPile: [],
+              workPiles: [[], [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'DiscardDraw',
+          playerIndex: 0,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: newPile('♦️9-♦️5'),
+          workPiles: [[], [], [], []],
+        },
+      ],
+    });
+  });
+
+  test('DiscardDraw 2 cards left on non-empty discard', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: newPile('♦️5-♦️9'),
+              drawDiscardPile: newPile('♣︎5'),
+              workPiles: [[], [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'DiscardDraw',
+          playerIndex: 0,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: newPile('♣︎5-♦️9-♦️5'),
+          workPiles: [[], [], [], []],
+        },
+      ],
+    });
+  });
+
+  test('DiscardDraw 1 cards left on empty discard', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: newPile('♦️9'),
+              drawDiscardPile: [],
+              workPiles: [[], [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'DiscardDraw',
+          playerIndex: 0,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: newPile('♦️9'),
+          workPiles: [[], [], [], []],
+        },
+      ],
+    });
+  });
+
+  test('DiscardDraw 1 cards left on non-empty discard', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: newPile('♦️9'),
+              drawDiscardPile: newPile('♣︎5'),
+              workPiles: [[], [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'DiscardDraw',
+          playerIndex: 0,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: newPile('♣︎5-♦️9'),
+          workPiles: [[], [], [], []],
+        },
+      ],
+    });
+  });
+});
