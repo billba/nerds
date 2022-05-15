@@ -275,7 +275,9 @@ function handUpdate(
 }
 
 function playPileOnOrUnderWorkpile(pile: Pile, workPile: Pile) {
-  return workPile.length === 0 || cardRank(pile[0]) < cardRank(workPile[0])
+  return workPile.length === 0
+    ? pile
+    : cardRank(pile[0]) < cardRank(workPile[0])
     ? [...workPile, ...pile]
     : [...pile, ...workPile];
 }
@@ -317,13 +319,12 @@ export function reducer(hand: HandState, action: Action): HandState {
       return handUpdate(hand, {
         playerIndex,
         ps: {
-          ...ps,
           drawDiscardPile: ps.drawDiscardPile.slice(0, -1),
         },
         acePileIndex: action.acePileIndex,
         acePile: [
           ...hand.acePiles[action.acePileIndex],
-          ...ps.drawDiscardPile.slice(-1),
+          topCard(ps.drawDiscardPile),
         ],
       });
     case 'PlayDrawDiscardOnOrUnderWorkPile':
@@ -345,19 +346,19 @@ export function reducer(hand: HandState, action: Action): HandState {
       return handUpdate(hand, {
         playerIndex,
         ps: {
-          nerdsDiscardPile: ps.nerdsDiscardPile.slice(0, -1),
+          nerdsDiscardPile: [],
         },
         acePileIndex: action.acePileIndex,
         acePile: [
           ...hand.acePiles[action.acePileIndex],
-          ...ps.nerdsDiscardPile.slice(-1),
+          topCard(ps.nerdsDiscardPile),
         ],
       });
     case 'PlayNerdsDiscardOnOrUnderWorkPile':
       return handUpdate(hand, {
         playerIndex,
         ps: {
-          nerdsDiscardPile: ps.nerdsDiscardPile.slice(0, -1),
+          nerdsDiscardPile: [],
           workPiles: arrayWithUpdatedElement(
             ps.workPiles,
             action.workPileIndex,
