@@ -8,7 +8,6 @@ import {
   workPilePlaysOnWorkPile,
   hasEmptyWorkPile,
   cardName,
-  newPile,
   Pile,
 } from './game';
 
@@ -133,7 +132,7 @@ function pileToString(pile: Pile) {
   return pile.length + (pile.length > 0 ? ':' + cardName(topCard(pile)) : '');
 }
 
-function handToString(hand: Partial<HandState>) {
+export function handToString(hand: Partial<HandState>) {
   return (
     'Ace Piles:' +
     hand.acePiles!.map(pileToString).join(' ') +
