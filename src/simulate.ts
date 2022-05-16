@@ -9,13 +9,45 @@ import {
   hasEmptyWorkPile,
   cardName,
   Pile,
+  newHand,
+  reducer,
 } from './game';
 
-// function play(numPlayers: number) {
-//   const hand = newHand(numPlayers);
-// }
+function playHand(numPlayers: number) {
+  let hand = newHand(numPlayers);
 
-// play(1);
+  console.clear();
+  console.log(handToString(hand));
+  let action = playerAction(hand, 0);
+  console.log('Next action for player ${0}', action);
+
+  // the following keyboard input code comes from https://stackoverflow.com/questions/5006821/nodejs-how-to-read-keystrokes-from-stdin
+  const stdin = process.stdin;
+  stdin.setRawMode(true);
+  stdin.resume();
+  stdin.setEncoding('utf8');
+
+  stdin.on('data', key => {
+    // ctrl-c ( end of text )
+    if (String(key) === '\u0003') {
+      console.log('EXIT');
+      process.exit();
+    }
+
+    if (action.name === 'CallNerds') {
+      console.log('NERDS!');
+      process.exit();
+    }
+
+    hand = reducer(hand, action);
+    action = playerAction(hand, 0);
+    console.clear();
+    console.log(handToString(hand));
+    console.log(`Next action for player ${0}`, action);
+  });
+}
+
+playHand(1);
 
 export function playerAction(hand: HandState, playerIndex: number): Action {
   const {acePiles, players} = hand,
@@ -129,29 +161,27 @@ export function playerAction(hand: HandState, playerIndex: number): Action {
 }
 
 function pileToString(pile: Pile) {
-  return pile.length + (pile.length > 0 ? ':' + cardName(topCard(pile)) : '');
+  return pile.length === 0 ? '(empty)' : pile.map(cardName).join('-');
 }
 
 export function handToString(hand: Partial<HandState>) {
   return (
-    'Ace Piles:' +
-    hand.acePiles!.map(pileToString).join(' ') +
+    'Ace Piles: \n  ' +
+    hand.acePiles!.map(pileToString).join('\n  ') +
     hand.players!.map(
       (player, playerIndex) =>
         '\nPlayer ' +
         playerIndex +
-        '\n  Work Piles: ' +
-        player.workPiles!.map(pileToString).join(' ') +
-        '\n  draw: ' +
-        player.drawPile.length +
-        (player.drawDiscardPile.length > 0
-          ? ':' + cardName(player.drawDiscardPile[0])
-          : '') +
-        '\n  nerds: ' +
-        player.nerdsPile.length +
-        (player.nerdsDiscardPile.length > 0
-          ? ':' + cardName(player.nerdsDiscardPile[0])
-          : '')
+        '\n  Work Piles:\n    ' +
+        player.workPiles!.map(pileToString).join('\n    ') +
+        '\n  Draw: ' +
+        pileToString(player.drawPile) +
+        '\n  Draw Discard: ' +
+        pileToString(player.drawDiscardPile) +
+        '\n  Nerds: ' +
+        pileToString(player.nerdsPile) +
+        '\n  Nerds Discard: ' +
+        pileToString(player.nerdsDiscardPile)
     )
   );
 }
