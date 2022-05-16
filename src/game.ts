@@ -425,13 +425,14 @@ export function reducer(hand: HandState, action: Action): HandState {
 export function getScores(hand: HandState) {
   const scores = Array<number>(hand.players.length).fill(0);
 
-  for (const [acePileIndex, acePile] of hand.acePiles.entries()) {
+  for (const acePile of hand.acePiles) {
     for (const card of acePile) {
       scores[cardDeck(card)]++;
     }
   }
   for (const [playerIndex, player] of hand.players.entries()) {
-    scores[playerIndex] -= player.nerdsPile.length + player.nerdsDiscardPile.length;
+    scores[playerIndex] -=
+      player.nerdsPile.length + player.nerdsDiscardPile.length;
   }
 
   return scores;
