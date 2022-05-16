@@ -1352,4 +1352,112 @@ describe('reducer', () => {
       ],
     });
   });
+
+  test('PlayWorkPileCardOnOrUnderWorkPile 2 cards on empty pile', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), newPile('♦️A'), [], []],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: [],
+              drawDiscardPile: [],
+              workPiles: [newPile('♠️3-♦️2'), [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'PlayWorkPileCardOnOrUnderWorkPile',
+          playerIndex: 0,
+          workPileIndex: 0,
+          dstWorkPileIndex: 1,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), newPile('♦️A'), [], []],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: [],
+          workPiles: [[], newPile('♠️3-♦️2'), [], []],
+        },
+      ],
+    });
+  });
+
+  test('PlayWorkPileCardOnOrUnderWorkPile 2 cards on non-empty pile', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), newPile('♦️A'), [], []],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: [],
+              drawDiscardPile: [],
+              workPiles: [newPile('♠️3-♦️2'), newPile('♦️4'), [], []],
+            },
+          ],
+        },
+        {
+          name: 'PlayWorkPileCardOnOrUnderWorkPile',
+          playerIndex: 0,
+          workPileIndex: 0,
+          dstWorkPileIndex: 1,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), newPile('♦️A'), [], []],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: [],
+          workPiles: [[], newPile('♦️4-♠️3-♦️2'), [], []],
+        },
+      ],
+    });
+  });
+
+  test('PlayWorkPileCardOnOrUnderWorkPile 2 cards under non-empty pile', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), newPile('♦️A'), [], []],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: [],
+              drawDiscardPile: [],
+              workPiles: [newPile('♦️4-♠️3'), newPile('♦️2'), [], []],
+            },
+          ],
+        },
+        {
+          name: 'PlayWorkPileCardOnOrUnderWorkPile',
+          playerIndex: 0,
+          workPileIndex: 0,
+          dstWorkPileIndex: 1,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), newPile('♦️A'), [], []],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: [],
+          workPiles: [[], newPile('♦️4-♠️3-♦️2'), [], []],
+        },
+      ],
+    });
+  });
 });
