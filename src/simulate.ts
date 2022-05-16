@@ -87,6 +87,7 @@ export function playerAction(hand: HandState, playerIndex: number): Action {
   // try to play work cards/piles on ace piles and other work piles
 
   for (const [workPileIndex, workPile] of ps.workPiles.entries()) {
+    if (workPile.length === 0) continue;
     const card = topCard(workPile);
 
     for (const [acePileIndex, acePile] of acePiles.entries()) {
@@ -101,6 +102,7 @@ export function playerAction(hand: HandState, playerIndex: number): Action {
     }
 
     for (const [dstWorkPileIndex, dstWorkPile] of ps.workPiles.entries()) {
+      if (dstWorkPile.length === 0) continue;
       if (workPile !== dstWorkPile) {
         if (
           workPilePlaysOnWorkPile(workPile, dstWorkPile) ||
@@ -113,8 +115,9 @@ export function playerAction(hand: HandState, playerIndex: number): Action {
             dstWorkPileIndex,
           };
         } else if (
-          cardPlaysOnWorkPile(card, dstWorkPile) ||
-          (_hasEmptyWorkPile && cardPlaysUnderWorkPile(card, dstWorkPile))
+          workPile.length === 1 &&
+          (cardPlaysOnWorkPile(card, dstWorkPile) ||
+            (_hasEmptyWorkPile && cardPlaysUnderWorkPile(card, dstWorkPile)))
         ) {
           return {
             name: 'PlayWorkPileCardOnOrUnderWorkPile',
