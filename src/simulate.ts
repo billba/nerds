@@ -13,13 +13,26 @@ import {
   reducer,
 } from './game';
 
+function rand(max: number) {
+  return Math.floor(Math.random() * max);
+}
+
 function playHand(numPlayers: number) {
   let hand = newHand(numPlayers);
+  let action: Action;
 
-  console.clear();
-  console.log(handToString(hand));
-  let action = playerAction(hand, 0);
-  console.log('Next action for player ${0}', action);
+  const nextPlay = () => {
+    const playerIndex = rand(numPlayers);
+    console.log('\x1Bc'); // clear screen
+    console.log(handToString(hand));
+    action = playerAction(hand, playerIndex);
+    console.log(`Next action for player ${playerIndex}`, action);
+    console.log(
+      '<space> for to play next action, <r> to redeal hand, <ctrl-c> to exit simulator'
+    );
+  };
+
+  nextPlay();
 
   // the following keyboard input code comes from https://stackoverflow.com/questions/5006821/nodejs-how-to-read-keystrokes-from-stdin
   const stdin = process.stdin;
@@ -28,26 +41,25 @@ function playHand(numPlayers: number) {
   stdin.setEncoding('utf8');
 
   stdin.on('data', key => {
-    // ctrl-c ( end of text )
-    if (String(key) === '\u0003') {
+    const k = String(key);
+    // ctrl-c exits simulator
+    if (k === '\u0003') {
       console.log('EXIT');
       process.exit();
-    }
-
-    if (action.name === 'CallNerds') {
-      console.log('NERDS!');
+    } else if (k === 'r') {
+      hand = newHand(numPlayers);
+    } else if (action.name === 'CallNerds') {
+      console.log(`PLAYER ${action.playerIndex} CALLED NERDS!`);
       process.exit();
+    } else {
+      hand = reducer(hand, action);
     }
 
-    hand = reducer(hand, action);
-    action = playerAction(hand, 0);
-    console.clear();
-    console.log(handToString(hand));
-    console.log(`Next action for player ${0}`, action);
+    nextPlay();
   });
 }
 
-playHand(1);
+playHand(3);
 
 export function playerAction(hand: HandState, playerIndex: number): Action {
   const {acePiles, players} = hand,

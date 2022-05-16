@@ -6,10 +6,11 @@ This is sample code and not an officially maintained Microsoft project. It is li
 
 # How to use
 
-At the moment this is just simple CLI UX.
+At the moment this is just simple CLI that shows a game between three simulated players.
 
 1. Clone this repo
 2. `npm install`
-3. `npm run compile && node build/simulate`
+3. `npm run compile`
+4. `node build/simulate`
 
-You will see the current hand (one player only at the moment) and the next action that will be taken. Press any key to take the action and see the revised hand, or ctrl-C to exit. The simulator is not very smart right now and can get stuck.
+You will see the current hand (one player only at the moment) and the next action that will be taken. Press `space` to take the action and see the revised hand, `r` to restart the game, or `ctrl-c` to exit.
