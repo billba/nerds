@@ -172,7 +172,7 @@ export function newHand(numPlayers: number): HandState {
 
   return {
     players,
-    acePiles: new Array(4 * numPlayers).fill([])
+    acePiles: new Array(4 * numPlayers).fill([]),
   };
 }
 
@@ -390,7 +390,11 @@ export function reducer(hand: HandState, action: Action): HandState {
         playerIndex,
         ps: {
           workPiles: arrayWithUpdatedElement(
-            arrayWithUpdatedElement(ps.workPiles, action.workPileIndex, ps.workPiles[action.workPileIndex].slice(0, -1)),
+            arrayWithUpdatedElement(
+              ps.workPiles,
+              action.workPileIndex,
+              ps.workPiles[action.workPileIndex].slice(0, -1)
+            ),
             action.dstWorkPileIndex,
             playPileOnOrUnderWorkpile(
               ps.workPiles[action.workPileIndex].slice(-1),
@@ -413,7 +417,7 @@ export function reducer(hand: HandState, action: Action): HandState {
           ),
         },
       });
-    }
+  }
 
   return hand;
 }
