@@ -149,22 +149,22 @@ export function newShuffledDeck(deck = 0): Pile {
 export function newHand(numPlayers: number): HandState {
   const players: PlayerState[] = [];
   for (let player = 0; player < numPlayers; player++) {
-    const draw = newShuffledDeck(player);
+    const drawPile = newShuffledDeck(player);
 
     const workPiles: Pile[] = [];
     for (let i = 0; i < 4; i++) {
-      workPiles.push([draw.pop()!]);
+      workPiles.push([drawPile.pop()!]);
     }
 
-    const nerds: Pile = [];
+    const nerdsPile: Pile = [];
     for (let i = 0; i < 13; i++) {
-      nerds.push(draw.pop()!);
+      nerdsPile.push(drawPile.pop()!);
     }
 
     players.push({
-      drawPile: draw,
+      drawPile,
       drawDiscardPile: [],
-      nerdsPile: nerds,
+      nerdsPile,
       nerdsDiscardPile: [],
       workPiles,
     });
@@ -172,7 +172,7 @@ export function newHand(numPlayers: number): HandState {
 
   return {
     players,
-    acePiles: [],
+    acePiles: new Array(4 * numPlayers).fill([])
   };
 }
 
@@ -390,6 +390,20 @@ export function reducer(hand: HandState, action: Action): HandState {
         playerIndex,
         ps: {
           workPiles: arrayWithUpdatedElement(
+            arrayWithUpdatedElement(ps.workPiles, action.workPileIndex, ps.workPiles[action.workPileIndex].slice(0, -1)),
+            action.dstWorkPileIndex,
+            playPileOnOrUnderWorkpile(
+              ps.workPiles[action.workPileIndex].slice(-1),
+              ps.workPiles[action.dstWorkPileIndex]
+            )
+          ),
+        },
+      });
+    case 'PlayWorkPileOnOrUnderWorkPile':
+      return handUpdate(hand, {
+        playerIndex,
+        ps: {
+          workPiles: arrayWithUpdatedElement(
             arrayWithUpdatedElement(ps.workPiles, action.workPileIndex, []),
             action.dstWorkPileIndex,
             playPileOnOrUnderWorkpile(
@@ -399,7 +413,7 @@ export function reducer(hand: HandState, action: Action): HandState {
           ),
         },
       });
-  }
+    }
 
   return hand;
 }
