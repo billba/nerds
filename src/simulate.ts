@@ -11,6 +11,7 @@ import {
   Pile,
   newHand,
   reducer,
+  getScores,
 } from './game';
 
 function rand(max: number) {
@@ -50,6 +51,11 @@ function playHand(numPlayers: number) {
       hand = newHand(numPlayers);
     } else if (action.name === 'CallNerds') {
       console.log(`PLAYER ${action.playerIndex} CALLED NERDS!`);
+      console.log("Scores:");
+      const scores = getScores(hand);
+      for (const [playerIndex, score] of scores.entries()) {
+        console.log(`Player ${playerIndex}: ${score}`);
+      }
       process.exit();
     } else {
       hand = reducer(hand, action);
