@@ -685,7 +685,7 @@ describe('reducer', () => {
     });
   });
 
-  test('CycleDraw', () => {
+  test('CycleDraw player 0', () => {
     expect(
       reducer(
         {
@@ -712,6 +712,54 @@ describe('reducer', () => {
           nerdsPile: [],
           nerdsDiscardPile: [],
           drawPile: newPile('♦️9-♦️5-♦️A-♣︎3'),
+          drawDiscardPile: [],
+          workPiles: [[], [], [], []],
+        },
+      ],
+    });
+  });
+
+  test('CycleDraw player 1', () => {
+    expect(
+      reducer(
+        {
+          acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+          players: [
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: [],
+              drawDiscardPile: newPile('♣︎3-♦️A-♦️5-♦️9'),
+              workPiles: [[], [], [], []],
+            },
+            {
+              nerdsPile: [],
+              nerdsDiscardPile: [],
+              drawPile: [],
+              drawDiscardPile: newPile('♦️A-♦️5-♦️9'),
+              workPiles: [[], [], [], []],
+            },
+          ],
+        },
+        {
+          name: 'CycleDraw',
+          playerIndex: 1,
+        }
+      )
+    ).toStrictEqual({
+      acePiles: [newPile('♣︎A-♣︎2'), [], [], newPile('♦️A')],
+      players: [
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: [],
+          drawDiscardPile: newPile('♣︎3-♦️A-♦️5-♦️9'),
+          workPiles: [[], [], [], []],
+        },
+        {
+          nerdsPile: [],
+          nerdsDiscardPile: [],
+          drawPile: newPile('♦️9-♦️5-♦️A'),
           drawDiscardPile: [],
           workPiles: [[], [], [], []],
         },
